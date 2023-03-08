@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +34,6 @@ public class UserController {
         return "user/list";
     }
 
-    // ----- 追加:ここから -----
     /** User登録画面を表示 */
     @GetMapping("/register")
     public String getRegister(@ModelAttribute User user) {
@@ -42,35 +43,41 @@ public class UserController {
 
     /** User登録処理 */
     @PostMapping("/register")
-    public String postRegister(User user) {
-        //user登録
+    public String postRegister(@Validated User user, BindingResult res, Model model) {
+        if(res.hasErrors()) {
+            // エラーあり
+            return getRegister(user);
+        }
+        // User登録
         service.saveUser(user);
-        //一覧画面にリダイレクト
-        return "redirect:/user/list";
-    }
-    /** User更新画面を表示 */
-    @GetMapping("/update/{id}/")
-    public String getUser(@PathVariable("id") Integer id, Model model) {
-        //modelに登録
-        model.addAttribute("user", service.getUser(id));
-        return "user/update";
-    }
-    /** User更新処理 */
-    @PostMapping("/update/{id}/")
-    public String postUser(User user) {
-        //User登録
-        service.saveUser(user);
-        //一覧画面にリダイレクト
-        return "redirect:/user/list";
-    }
-    // ----- 追加:ここから -----
-    /** User削除処理 */
-    @PostMapping(path="list", params="deleteRun")
-    public String deleteRun(@RequestParam(name="idck") Set<Integer> idck, Model model) {
-        //Userを一括削除
-        service.deleteUser(idck);
-        //一覧画面にリダイレクト
+        // 一覧画面にリダイレクト
         return "redirect:/user/list";
     }
 
+    /** User更新画面を表示 */
+    @GetMapping("/update/{id}/")
+    public String getUser(@PathVariable("id") Integer id, Model model) {
+        // Modelに登録
+        model.addAttribute("user", service.getUser(id));
+        // User更新画面に遷移
+        return "user/update";
+    }
+
+    /** User更新処理 */
+    @PostMapping("/update/{id}/")
+    public String postUser(User user) {
+        // User登録
+        service.saveUser(user);
+        // 一覧画面にリダイレクト
+        return "redirect:/user/list";
+    }
+
+    /** User削除処理 */
+    @PostMapping(path="list", params="deleteRun")
+    public String deleteRun(@RequestParam(name="idck") Set<Integer> idck, Model model) {
+        // Userを一括削除
+        service.deleteUser(idck);
+        // 一覧画面にリダイレクト
+        return "redirect:/user/list";
+    }
 }
