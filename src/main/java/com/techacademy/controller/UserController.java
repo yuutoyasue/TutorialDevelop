@@ -61,7 +61,7 @@ public class UserController {
             // Modelに登録
             model.addAttribute("user", service.getUser(id));
         }
-        if (id == null) {
+        else {
             model.addAttribute("user", user);
         }
         // User更新画面に遷移
